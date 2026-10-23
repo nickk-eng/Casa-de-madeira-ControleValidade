@@ -1,37 +1,26 @@
-# Controle de validade — Casa de Madeira
+# Casa de Madeira — Controle de validade
 
-Projeto básico para apoiar o cadastro de alimentos e o acompanhamento das datas de vencimento do restaurante Casa de Madeira.
+Aplicação Node.js com PostgreSQL. Cadastro, edição, exclusão, filtros e exportação CSV. A tabela é criada automaticamente ao iniciar o servidor. Acesso protegido por senha compartilhada: no navegador informe qualquer nome de usuário e a senha APP_PASSWORD.
 
-## Como usar
+## Publicar no Render
 
-1. Mantenha `index.html`, `style.css` e `script.js` na mesma pasta.
-2. Abra `index.html` no navegador.
-3. Cadastre o nome, a quantidade, a unidade e a data de vencimento do alimento.
-4. Consulte os alertas, busque pelo nome ou filtre pela situação.
-5. Use **Editar**, **Excluir** ou **Exportar CSV** quando necessário.
+1. Crie um repositório no GitHub e envie os arquivos desta pasta, incluindo package.json, server.js, schema.sql e render.yaml. Não envie .env ou node_modules.
+2. No Render, selecione New > Blueprint e conecte esse repositório.
+3. O Render lerá render.yaml e preparará o serviço e o PostgreSQL. Informe uma senha forte em APP_PASSWORD e confira os planos e custos antes de confirmar.
+4. Aguarde a publicação e abra o endereço do serviço. Entre com qualquer usuário e a senha definida.
+5. Cadastre um alimento, recarregue a página, edite e exclua para conferir o banco.
 
-## Funcionalidades
+Alternativa manual: crie um Render Postgres e um Web Service Node na mesma região. Build Command: npm install. Start Command: npm start. Configure DATABASE_URL com a Internal Database URL do PostgreSQL e APP_PASSWORD com uma senha forte.
 
-- Cadastro e edição de alimentos e lotes com vencimentos diferentes.
-- Quantidades com até duas casas decimais.
-- Listagem ordenada pelo vencimento mais próximo.
-- Indicadores de total de cadastros, vencidos e vencimentos entre hoje e os próximos três dias.
-- Busca por nome e filtro por situação.
-- Exclusão com confirmação.
-- Salvamento no navegador por meio de localStorage.
-- Exportação dos cadastros em CSV para consulta em planilhas.
-- Layout adaptado para computador e celular.
+## Rodar localmente
 
-## Tecnologias
+Instale Node.js 22 ou superior e PostgreSQL. Execute npm install. Copie .env.example para .env e ajuste os valores. Execute node --env-file=.env server.js e abra http://localhost:3000.
 
-HTML estrutura a página, CSS define a aparência e JavaScript realiza os cadastros, filtros e cálculos. O projeto não utiliza bibliotecas externas nem exige instalação.
+## Dados e acesso
 
-## Limitações
+Os registros são compartilhados entre os dispositivos com acesso à senha. Os cadastros antigos do navegador não são transferidos automaticamente: exporte o CSV na versão antiga para preservar uma cópia e recadastre-os na versão publicada. Exporte cópias periódicas. Confira as condições e a validade do banco gratuito no Render; ele não deve ser tratado como armazenamento permanente sem verificar o plano. A senha compartilhada não oferece contas individuais nem histórico de alterações.
 
-Os dados pertencem ao navegador e ao computador utilizados. Não há conta de usuário, sincronização, banco de dados no servidor ou notificações com a página fechada. Limpar os dados do navegador pode apagar os cadastros. A disponibilidade de localStorage para arquivos abertos diretamente pode variar entre navegadores. O sistema avisa se não conseguir salvar. O CSV exportado serve para consulta e não possui importação automática de volta para o sistema.
+## Verificação
 
-O indicador considera apenas a data cadastrada. O prazo de três dias é uma configuração de alerta do projeto, não uma avaliação das condições do alimento.
+Sintaxe do servidor e do navegador verificada com Node. A integração com PostgreSQL precisa ser validada após configurar uma instância real e DATABASE_URL.
 
-## Sugestão de aplicação na atividade de extensão
-
-Apresentar a ferramenta ao responsável pelo restaurante, cadastrar os alimentos com as datas reais fornecidas pelo estabelecimento, orientar o uso e registrar as atividades efetivamente realizadas. Para o relatório acadêmico, preencher os dados do aluno, curso, instituição, período e carga horária conforme as regras da faculdade. Este código não comprova a execução da atividade nem garante a validação das horas.

@@ -14,17 +14,12 @@ function dataValida(valor) {
     `${String(data.getFullYear()).padStart(4, '0')}-${String(data.getMonth() + 1).padStart(2, '0')}-${String(data.getDate()).padStart(2, '0')}` === valor;
 }
 
-try {
-  const dados = JSON.parse(localStorage.getItem(CHAVE) || '[]');
-  if (!Array.isArray(dados)) throw new Error('Formato inválido');
-  alimentos = dados.filter(item => item && typeof item.id === 'string' &&
-    typeof item.nome === 'string' && typeof item.unidade === 'string' &&
-    Number.isFinite(item.quantidade) && item.quantidade > 0 && dataValida(item.validade));
-} catch {
-  armazenamentoDisponivel = false;
-  el('mensagem').textContent = 'Não foi possível carregar os dados. Os novos cadastros ficarão apenas nesta sessão; exporte um CSV para guardá-los.';
+async function api(url, options = {}) {
+ const r = await fetch(url, {...options, headers: {'Content-Type':'application/json'}});
+ if (!r.ok) throw new Error('Falha ao acessar o banco. Tente novamente.');
+ return r.status === 204 ? null : r.json();
 }
-
+async function carregar() { try { alimentos = await api('/api/alimentos'); renderizar(); } catch(e) { el('mensagem').textContent = e.message; } }
 // Compara dias do calendário local, sem erros por horário ou mudança de fuso.
 function diasRestantes(validade, hoje = new Date()) {
   const [ano, mes, dia] = validade.split('-').map(Number);
@@ -40,16 +35,7 @@ function situacao(validade) {
   return { tipo: 'regular', texto: 'Mais de 3 dias' };
 }
 
-function persistir(mensagem) {
-  if (armazenamentoDisponivel) {
-    try { localStorage.setItem(CHAVE, JSON.stringify(alimentos)); }
-    catch { armazenamentoDisponivel = false; }
-  }
-  el('mensagem').textContent = armazenamentoDisponivel ? mensagem :
-    mensagem + ' Atenção: os dados estão apenas nesta sessão. Exporte um CSV para guardá-los.';
-  renderizar();
-}
-
+function persistir(mensagem) { el('mensagem').textContent = mensagem; renderizar(); }
 function celula(linha, texto) {
   const td = document.createElement('td');
   td.textContent = texto;
@@ -113,15 +99,16 @@ function editar(id) {
   el('nome').focus();
 }
 
-function excluir(id) {
+async function excluir(id) {
   const alimento = alimentos.find(a => a.id === id);
   if (!alimento || !confirm(`Excluir o cadastro de ${alimento.nome}?`)) return;
+  try { await api('/api/alimentos/' + encodeURIComponent(id), {method:'DELETE'}); } catch(e) { el('mensagem').textContent=e.message; return; }
   alimentos = alimentos.filter(a => a.id !== id);
   if (editando === id) cancelarEdicao();
   persistir('Alimento excluído.');
 }
 
-el('formulario').addEventListener('submit', evento => {
+el('formulario').addEventListener('submit', async evento => {
   evento.preventDefault();
   const nome = el('nome').value.trim();
   const quantidade = Number(el('quantidade').value);
@@ -133,6 +120,8 @@ el('formulario').addEventListener('submit', evento => {
   const alimento = { id: editando || `alimento-${Date.now()}-${Math.random().toString(36).slice(2)}`,
     nome, quantidade, unidade: el('unidade').value, validade };
   const eraEdicao = editando !== null;
+  el('salvar').disabled=true;
+  try { await api('/api/alimentos/' + encodeURIComponent(alimento.id), {method:'PUT', body:JSON.stringify(alimento)}); } catch(e) { el('mensagem').textContent=e.message; return; } finally { el('salvar').disabled=false; }
   if (eraEdicao) alimentos = alimentos.map(a => a.id === editando ? alimento : a);
   else alimentos.push(alimento);
   cancelarEdicao();
@@ -163,7 +152,7 @@ el('exportar').addEventListener('click', () => {
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 });
 
-renderizar();
+carregar();
 // Atualiza os alertas caso a tela continue aberta durante a virada do dia.
 setInterval(renderizar, 60000);
 window.addEventListener('focus', renderizar);
