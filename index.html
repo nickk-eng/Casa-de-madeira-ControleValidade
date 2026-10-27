@@ -1,41 +1,125 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-BR">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Casa de Madeira | Controle de validade</title>
-  <link rel="stylesheet" href="style.css">
-  <script src="script.js" defer></script>
-</head>
-<body>
-  <header><div class="container"><span class="marca">CM</span><div><p class="sobretitulo">RESTAURANTE</p><h1>Casa de Madeira</h1></div></div></header>
-  <main class="container">
-    <div class="introducao"><p class="sobretitulo">ORGANIZAÇÃO DA COZINHA</p><h2>Controle de validade</h2><p>Cadastre os alimentos e acompanhe o que precisa de atenção.</p></div>
-    <section class="resumo" aria-label="Resumo do estoque">
-      <article><span>Alimentos cadastrados</span><strong id="total">0</strong></article>
-      <article><span>Vencem em até 3 dias</span><strong id="proximos">0</strong></article>
-      <article><span>Vencidos</span><strong id="vencidos">0</strong></article>
-    </section>
-    <section class="painel">
-      <h3 id="titulo-formulario">Cadastrar alimento</h3>
-      <form id="formulario">
-        <div class="campos">
-          <label>Nome do alimento<input id="nome" required maxlength="80" placeholder="Ex.: Arroz"></label>
-          <label>Quantidade<input id="quantidade" type="number" min="0.01" step="0.01" required placeholder="Ex.: 5"></label>
-          <label>Unidade<select id="unidade"><option>kg</option><option>g</option><option>L</option><option>mL</option><option>unidade(s)</option><option>pacote(s)</option></select></label>
-          <label>Data de vencimento<input id="validade" type="date" required></label>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Casa de Madeira | Controle de validade</title>
+    <link rel="stylesheet" href="style.css" />
+    <script src="script.js" defer></script>
+  </head>
+  <body>
+    <header>
+      <div class="container">
+        <span class="marca">CM</span>
+        <div>
+          <p class="sobretitulo">RESTAURANTE</p>
+          <h1>Casa de Madeira</h1>
         </div>
-        <div class="acoes"><button type="submit" id="salvar">Cadastrar alimento</button><button type="button" class="secundario" id="cancelar" hidden>Cancelar edição</button></div>
-      </form>
-    </section>
-    <section class="painel">
-      <div class="cabecalho-lista"><h3>Alimentos do restaurante</h3><button class="secundario" id="exportar" type="button">Exportar CSV</button></div>
-      <div class="filtros"><label>Buscar alimento<input type="search" id="busca" placeholder="Digite um nome..."></label><label>Situação<select id="filtro"><option value="todos">Todos os alimentos</option><option value="vencido">Vencidos</option><option value="proximo">Vencem em até 3 dias</option><option value="regular">Mais de 3 dias</option></select></label></div>
-      <div class="tabela"><table><thead><tr><th>Alimento</th><th>Quantidade</th><th>Vencimento</th><th>Situação</th><th>Ações</th></tr></thead><tbody id="lista"></tbody></table></div>
-      <p id="vazio" class="vazio">Nenhum alimento cadastrado. Comece pelo formulário acima.</p>
-    </section>
-    <p id="mensagem" role="status" aria-live="polite"></p>
-    <footer>Projeto de extensão • Casa de Madeira<br>Os dados ficam salvos no banco de dados do restaurante. Exporte o CSV para guardar uma cópia.</footer>
-  </main>
-</body>
+        <button id="sair" class="secundario" type="button">Sair</button>
+      </div>
+    </header>
+    <main class="container">
+      <div class="introducao">
+        <p class="sobretitulo">ORGANIZAÇÃO DA COZINHA</p>
+        <h2>Controle de validade</h2>
+        <p>Cadastre os alimentos e acompanhe o que precisa de atenção.</p>
+      </div>
+      <section class="resumo" aria-label="Resumo do estoque">
+        <article>
+          <span>Alimentos cadastrados</span><strong id="total">0</strong>
+        </article>
+        <article>
+          <span>Vencem em até 3 dias</span><strong id="proximos">0</strong>
+        </article>
+        <article><span>Vencidos</span><strong id="vencidos">0</strong></article>
+      </section>
+      <section class="painel">
+        <h3 id="titulo-formulario">Cadastrar alimento</h3>
+        <form id="formulario">
+          <div class="campos">
+            <label
+              >Nome do alimento<input
+                id="nome"
+                required
+                maxlength="80"
+                placeholder="Ex.: Arroz"
+            /></label>
+            <label
+              >Quantidade<input
+                id="quantidade"
+                type="number"
+                min="0.01"
+                step="0.01"
+                required
+                placeholder="Ex.: 5"
+            /></label>
+            <label
+              >Unidade<select id="unidade">
+                <option>kg</option>
+                <option>g</option>
+                <option>L</option>
+                <option>mL</option>
+                <option>unidade(s)</option>
+                <option>pacote(s)</option>
+              </select></label
+            >
+            <label
+              >Data de vencimento<input id="validade" type="date" required
+            /></label>
+          </div>
+          <div class="acoes">
+            <button type="submit" id="salvar">Cadastrar alimento</button
+            ><button type="button" class="secundario" id="cancelar" hidden>
+              Cancelar edição
+            </button>
+          </div>
+        </form>
+      </section>
+      <section class="painel">
+        <div class="cabecalho-lista">
+          <h3>Alimentos do restaurante</h3>
+          <button class="secundario" id="exportar" type="button">
+            Exportar CSV
+          </button>
+        </div>
+        <div class="filtros">
+          <label
+            >Buscar alimento<input
+              type="search"
+              id="busca"
+              placeholder="Digite um nome..." /></label
+          ><label
+            >Situação<select id="filtro">
+              <option value="todos">Todos os alimentos</option>
+              <option value="vencido">Vencidos</option>
+              <option value="proximo">Vencem em até 3 dias</option>
+              <option value="regular">Mais de 3 dias</option>
+            </select></label
+          >
+        </div>
+        <div class="tabela">
+          <table>
+            <thead>
+              <tr>
+                <th>Alimento</th>
+                <th>Quantidade</th>
+                <th>Vencimento</th>
+                <th>Situação</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody id="lista"></tbody>
+          </table>
+        </div>
+        <p id="vazio" class="vazio">
+          Nenhum alimento cadastrado. Comece pelo formulário acima.
+        </p>
+      </section>
+      <p id="mensagem" role="status" aria-live="polite"></p>
+      <footer>
+        Projeto de extensão • Casa de Madeira<br />Os dados ficam salvos no
+        banco de dados do restaurante. Exporte o CSV para guardar uma cópia.
+      </footer>
+    </main>
+  </body>
 </html>

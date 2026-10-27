@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Entrar | Casa de Madeira</title>
+    <link rel="stylesheet" href="/style.css" />
+    <script src="/login.js" defer></script>
+  </head>
+  <body>
+    <header>
+      <div class="container">
+        <span class="marca">CM</span>
+        <div>
+          <p class="sobretitulo">RESTAURANTE</p>
+          <h1>Casa de Madeira</h1>
+        </div>
+      </div>
+    </header>
+    <main class="login-container">
+      <div class="introducao">
+        <p class="sobretitulo">ACESSO DOS FUNCIONÁRIOS</p>
+        <h2>Bem-vindo à equipe</h2>
+        <p>Entre para acompanhar a validade dos alimentos do restaurante.</p>
+      </div>
+      <section class="painel">
+        <h3>Controle de validade</h3>
+        <form id="login-form">
+          <label
+            >Usuário<input
+              id="usuario"
+              name="username"
+              autocomplete="username"
+              required
+              maxlength="120"
+              autofocus /></label
+          ><label
+            >Senha<input
+              id="senha"
+              name="password"
+              type="password"
+              autocomplete="current-password"
+              required
+              maxlength="256"
+          /></label>
+          <div class="acoes">
+            <button id="entrar" type="submit">Entrar no sistema</button
+            ><button
+              id="mostrar"
+              type="button"
+              class="secundario"
+              aria-pressed="false"
+            >
+              Mostrar senha
+            </button>
+          </div>
+          <p id="login-mensagem" role="status" aria-live="polite"></p>
+        </form>
+      </section>
+      <footer>Casa de Madeira • Acesso restrito aos funcionários</footer>
+    </main>
+  </body>
+</html>

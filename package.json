@@ -1,1 +1,16 @@
-{"name":"cm-controle-validade","version":"1.0.0","private":true,"scripts":{"start":"node server.js"},"engines":{"node":">=22"},"dependencies":{"express":"^5.1.0","pg":"^8.16.3"}}
+{
+  "name": "cm-controle-validade",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "start": "node --env-file-if-exists=.env server.js",
+    "check": "node --check server.js && node --check script.js && node --check login.js"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "dependencies": {
+    "express": "^5.1.0",
+    "pg": "^8.16.3"
+  }
+}

@@ -11,9 +11,10 @@ services:
         fromDatabase:
           name: cm-validade-db
           property: connectionString
+      - key: APP_USERNAME
+        value: funcionarios
       - key: APP_PASSWORD
         sync: false
 databases:
   - name: cm-validade-db
     plan: free
-
