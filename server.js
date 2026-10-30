@@ -1,17 +1,18 @@
 "use strict";
 const express = require("express");
-const { Pool } = require("pg");
-const { readFileSync } = require("node:fs");
+const { MongoClient } = require("mongodb");
 const path = require("node:path");
 const { timingSafeEqual, randomBytes } = require("node:crypto");
-if (!process.env.DATABASE_URL || !process.env.APP_PASSWORD)
-  throw new Error("Configure DATABASE_URL e APP_PASSWORD.");
-const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+if (!process.env.MONGODB_URI || !process.env.APP_PASSWORD)
+  throw new Error("Configure MONGODB_URI e APP_PASSWORD.");
+const client = new MongoClient(process.env.MONGODB_URI, { serverSelectionTimeoutMS: 10000 });
+const db = client.db(process.env.MONGODB_DB || "cm_validade");
+const alimentos = db.collection("alimentos");
 const app = express();
 app.disable("x-powered-by");
 app.get("/health", async (req, res) => {
   try {
-    await pool.query("SELECT 1");
+    await db.command({ ping: 1 });
     res.json({ ok: true });
   } catch {
     res.sendStatus(503);
@@ -104,16 +105,11 @@ app.use((req, res, next) => {
     return res.status(401).json({ error: "Entre para continuar." });
   res.redirect("/login");
 });
-const fields =
-  "id, nome, quantidade, unidade, to_char(validade, 'YYYY-MM-DD') AS validade";
-app.get("/api/alimentos", async (req, res) =>
-  res.json(
-    (await pool.query(`SELECT ${fields} FROM alimentos ORDER BY validade,nome`))
-      .rows,
-  ),
-);
+app.get("/api/alimentos", async (req, res) => {
+  res.json(await alimentos.find({}, { projection: { _id: 0, criado_em: 0 } }).sort({ validade: 1, nome: 1 }).toArray());
+});
 app.put("/api/alimentos/:id", async (req, res) => {
-  const { nome, quantidade, unidade, validade } = req.body;
+  const { nome, quantidade, unidade, validade } = req.body || {};
   const date = new Date(validade + "T12:00:00Z");
   if (
     !req.params.id ||
@@ -130,14 +126,14 @@ app.put("/api/alimentos/:id", async (req, res) => {
     date.toISOString().slice(0, 10) !== validade
   )
     return res.status(400).json({ error: "Dados inválidos." });
-  const result = await pool.query(
-    `INSERT INTO alimentos(id,nome,quantidade,unidade,validade) VALUES($1,$2,$3,$4,$5) ON CONFLICT(id) DO UPDATE SET nome=$2,quantidade=$3,unidade=$4,validade=$5 RETURNING ${fields}`,
-    [req.params.id, nome.trim(), quantidade, unidade, validade],
-  );
-  res.json(result.rows[0]);
+  const alimento = { id: req.params.id, nome: nome.trim(), quantidade, unidade, validade };
+  await alimentos.updateOne({ id: alimento.id }, {
+    $set: alimento, $setOnInsert: { criado_em: new Date() }
+  }, { upsert: true });
+  res.json(alimento);
 });
 app.delete("/api/alimentos/:id", async (req, res) => {
-  await pool.query("DELETE FROM alimentos WHERE id=$1", [req.params.id]);
+  await alimentos.deleteOne({ id: req.params.id });
   res.sendStatus(204);
 });
 for (const file of ["index.html", "script.js", "style.css"])
@@ -149,10 +145,13 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: "Não foi possível concluir a operação." });
 });
 async function start() {
-  await pool.query(readFileSync(path.join(__dirname, "schema.sql"), "utf8"));
+  await client.connect();
+  await alimentos.createIndex({ id: 1 }, { unique: true });
+  await alimentos.createIndex({ validade: 1, nome: 1 });
+  console.log("MongoDB conectado.");
   app.listen(process.env.PORT || 3000, "0.0.0.0");
 }
-start().catch((err) => {
+start().catch(async (err) => {
   console.error(err.message);
   process.exit(1);
 });

@@ -3,18 +3,17 @@ services:
     name: cm-controle-validade
     runtime: node
     plan: free
-    buildCommand: npm install
+    buildCommand: npm ci
     startCommand: npm start
     healthCheckPath: /health
     envVars:
-      - key: DATABASE_URL
-        fromDatabase:
-          name: cm-validade-db
-          property: connectionString
+      - key: NODE_VERSION
+        value: 22
+      - key: MONGODB_URI
+        sync: false
+      - key: MONGODB_DB
+        value: cm_validade
       - key: APP_USERNAME
         value: funcionarios
       - key: APP_PASSWORD
         sync: false
-databases:
-  - name: cm-validade-db
-    plan: free
